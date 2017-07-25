@@ -18,12 +18,12 @@ module CASServer::Model
                           Time.now - max_lifetime,
                           Time.now - max_unconsumed_lifetime]
                         
-          expired_tickets_count = count(:conditions => conditions)
+          expired_tickets_count = where(conditions).count
 
           $LOG.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
             "#{'s' if expired_tickets_count > 1}.") if expired_tickets_count > 0
 
-          destroy_all(conditions)
+          where(conditions).destroy_all
         end
       end
     end

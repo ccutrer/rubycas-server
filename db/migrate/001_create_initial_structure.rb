@@ -1,4 +1,4 @@
-class CreateInitialStructure < ActiveRecord::Migration
+class CreateInitialStructure < ActiveRecord::Migration[4.2]
   def self.up
     # Oracle table names cannot exceed 30 chars...
     # See http://code.google.com/p/rubycas-server/issues/detail?id=15

@@ -1,4 +1,4 @@
-class AddIndexesForPerformance < ActiveRecord::Migration
+class AddIndexesForPerformance < ActiveRecord::Migration[4.2]
   def self.up
     add_index :casserver_lt,  :ticket
     add_index :casserver_st,  :ticket
