@@ -322,7 +322,11 @@ module CASServer
 
       begin
         if @service
-          if @renew
+          if !service_allowed?(@service)
+            $LOG.warn("Disallowed service '#{@service}'.")
+            @message = {:type => 'mistake',
+                        :message => t.error.disallowed_service}
+          elsif @renew
             $LOG.info("Authentication renew explicitly requested. Proceeding with CAS login for service #{@service.inspect}.")
           elsif tgt && !tgt_error
             $LOG.debug("Valid ticket granting ticket detected.")
@@ -407,6 +411,13 @@ module CASServer
       if @username && settings.config[:downcase_username]
         $LOG.debug("Converting username #{@username.inspect} to lowercase because 'downcase_username' option is enabled.")
         @username.downcase!
+      end
+
+      if !@service.blank? && !service_allowed?(@service)
+        @message = {:type => 'mistake',
+                    :message => t.error.disallowed_service}
+        status 400
+        return render @template_engine, :login
       end
 
       if error = validate_login_ticket(@lt)
@@ -763,6 +774,12 @@ module CASServer
     rescue Errno::ENOENT
       raise unless @custom_views
       super engine, data, options, views
+    end
+
+    def service_allowed?(service)
+      allowed_uris = Array(settings.config[:allowed_service_uris])
+
+      allowed_uris.empty? || allowed_uris.include?(service)
     end
 
     def ip_allowed?(ip)

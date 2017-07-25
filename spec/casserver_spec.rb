@@ -36,6 +36,18 @@ describe 'CASServer' do
       page.should have_content("You have successfully logged in")
     end
 
+    it "auto-forwards when you're already logged in" do
+      visit "/login"
+
+      fill_in 'username', :with => VALID_USERNAME
+      fill_in 'password', :with => VALID_PASSWORD
+      click_button 'login-submit'
+
+      visit "/login?service="+CGI.escape(@target_service)
+
+      page.current_url.should =~ /^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/
+    end
+
     it "fails to log in with invalid password" do
       visit "/login"
       fill_in 'username', :with => VALID_USERNAME
@@ -91,6 +103,38 @@ describe 'CASServer' do
       page.should_not have_xpath("//script")
       #page.should have_xpath("<script>alert(32)</script>")
     end
+
+    describe 'service_uri validation' do
+      let(:service) { 'http://imposter.com/' }
+
+      it "doesn't redirect back to untrusted services" do
+        visit "/login?service="+CGI.escape(service)
+
+        page.should have_content("The target service is not allowed")
+
+        fill_in 'username', :with => VALID_USERNAME
+        fill_in 'password', :with => VALID_PASSWORD
+
+        click_button 'login-submit'
+
+        page.should have_content("The target service is not allowed")
+      end
+
+      it "doesn't redirect back when already logged in" do
+        visit "/login"
+
+        fill_in 'username', :with => VALID_USERNAME
+        fill_in 'password', :with => VALID_PASSWORD
+
+        click_button 'login-submit'
+
+        visit "/login?service="+CGI.escape(service)
+
+        page.should have_content("The target service is not allowed")
+      end
+
+    end
+
 
   end # describe '/login'
 

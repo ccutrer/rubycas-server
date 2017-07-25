@@ -51,3 +51,6 @@ enable_single_sign_out: true
 
 allowed_service_ips:
   - 127.0.0.0/24
+
+allowed_service_uris:
+  - http://my.app.test

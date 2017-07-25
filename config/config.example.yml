@@ -534,9 +534,13 @@ log:
 #downcase_username: true
 
 # If you'd like to limit the service hosts that can use CAS for authentication,
-# add the individual IPs and IP ranges in CIDR notation below. Leaving this
-# setting blank will allow any server to authenticate users via the CAS server
+# you can either limit specific service URIs (validating the service parameter),
+# or add the individual IPs and IP ranges in CIDR notation below. Leaving these
+# settings blank will allow any server to authenticate users via the CAS server
 # and potentially harvest sensitive user information.
+
+#allowed_service_uris:
+#  - https://myservice.com/login/cas
 
 #allowed_service_ips:
 #  - 127.0.0.1
